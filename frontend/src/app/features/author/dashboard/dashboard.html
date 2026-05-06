@@ -1,0 +1,60 @@
+<div class="dashboard-container py-8 animate-fade-in">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl m-0">Dashboard</h1>
+      <p class="text-secondary mt-1">Welcome back, Alex. Here's what's happening with your content.</p>
+    </div>
+    <button class="btn btn-primary shadow-lg" routerLink="/author/editor">
+      Write a Story
+    </button>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    @for (stat of stats; track stat.label) {
+      <div class="stat-card glass p-6 rounded-xl border border-white/5 shadow-md hover:-translate-y-1 transition-transform">
+        <div class="text-secondary mb-2 font-medium">{{ stat.label }}</div>
+        <div class="text-3xl font-bold text-primary">{{ stat.value }}</div>
+      </div>
+    }
+  </div>
+
+  <!-- Recent Posts -->
+  <div class="card bg-surface rounded-xl border p-0 overflow-hidden">
+    <div class="p-6 border-b flex justify-between items-center">
+      <h2 class="text-xl m-0">Your Stories</h2>
+      <button class="text-sm text-primary font-medium hover:underline">View All</button>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-black/20 text-secondary text-sm">
+            <th class="p-4 font-medium">Title</th>
+            <th class="p-4 font-medium">Status</th>
+            <th class="p-4 font-medium">Date</th>
+            <th class="p-4 font-medium text-right">Views</th>
+            <th class="p-4 font-medium text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (post of posts; track post.title) {
+            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td class="p-4 font-medium">{{ post.title }}</td>
+              <td class="p-4">
+                <span class="status-badge" [class.published]="post.status === 'PUBLISHED'" [class.draft]="post.status === 'DRAFT'">
+                  {{ post.status }}
+                </span>
+              </td>
+              <td class="p-4 text-muted text-sm">{{ post.createdAt | date }}</td>
+              <td class="p-4 text-right">{{ post.viewCount }}</td>
+              <td class="p-4 text-center">
+                <button class="text-primary hover:text-white transition-colors">Edit</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

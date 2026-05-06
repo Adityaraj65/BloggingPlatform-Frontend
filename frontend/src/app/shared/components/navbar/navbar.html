@@ -1,0 +1,82 @@
+<header class="navbar glass">
+  <div class="container flex justify-between items-center h-16">
+    <a routerLink="/" class="logo flex items-center gap-2">
+      <div class="logo-icon"></div>
+      <span class="logo-text">InkWell</span>
+    </a>
+    
+    <nav class="nav-links flex items-center gap-6">
+      <a routerLink="/" class="nav-link">Home</a>
+      <a routerLink="/categories" class="nav-link">Explore</a>
+      
+      <div class="divider"></div>
+      
+      @if (currentUser$ | async; as user) {
+        <!-- User is logged in -->
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-secondary">
+            {{ user.fullName || user.username }}
+            <span class="text-xs px-2 py-1 bg-primary/20 text-primary rounded-full ml-1">
+              {{ user.role }}
+            </span>
+          </span>
+          
+          @if (user.role === 'AUTHOR' || user.role === 'ADMIN') {
+            <a routerLink="/author/editor" class="btn btn-primary btn-sm">Create Post</a>
+          }
+          
+          <div class="relative">
+            <button class="relative p-2 text-secondary hover:text-primary transition-colors" (click)="toggleNotifications()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              @if (unreadCount > 0) {
+                <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+              }
+            </button>
+            
+            @if (showNotifications) {
+              <div class="absolute right-0 top-full mt-2 w-80 glass rounded-lg shadow-xl p-4 z-50">
+                <h4 class="font-bold mb-3 flex justify-between items-center text-sm">
+                  Notifications
+                  @if (unreadCount > 0) {
+                    <span class="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-xs">{{ unreadCount }} new</span>
+                  }
+                </h4>
+                <div class="space-y-3 max-h-64 overflow-y-auto">
+                  @for (notif of notifications; track notif.notificationId) {
+                    <div class="p-3 rounded-md border" [class.bg-primary/5]="!notif.isRead" [class.border-primary/20]="!notif.isRead" [class.border-transparent]="notif.isRead" [class.opacity-70]="notif.isRead">
+                      <div class="font-medium text-sm mb-1">{{ notif.title }}</div>
+                      <div class="text-xs text-secondary mb-2">{{ notif.message }}</div>
+                      <div class="text-[10px] text-muted">{{ notif.createdAt | date:'short' }}</div>
+                    </div>
+                  } @empty {
+                    <div class="text-center text-secondary py-4 text-sm">No notifications</div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="relative group z-50">
+            <button class="flex items-center gap-2 text-sm hover:text-primary transition-colors">
+              <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
+                {{ (user.fullName || user.username).charAt(0).toUpperCase() }}
+              </div>
+            </button>
+            
+            <div class="absolute right-0 top-full mt-2 w-48 glass rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+              <a routerLink="/profile" class="block px-3 py-2 text-sm hover:bg-primary/10 rounded">Profile</a>
+              @if (user.role === 'ADMIN') {
+                <a routerLink="/admin" class="block px-3 py-2 text-sm hover:bg-primary/10 rounded">Admin Panel</a>
+              }
+              <button (click)="logout()" class="block w-full text-left px-3 py-2 text-sm hover:bg-primary/10 rounded text-danger">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <!-- User is not logged in -->
+        <a routerLink="/login" class="nav-link hover:text-primary transition-colors">Sign In</a>
+        <a routerLink="/register" class="btn btn-primary font-medium px-6 py-2 rounded-lg transition-all hover:scale-105">Get Started</a>
+      }
+    </nav>
+  </div>
+</header>

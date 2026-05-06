@@ -1,0 +1,61 @@
+.max-w-4xl { max-width: 56rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.text-4xl { font-size: 2.25rem; }
+@media (min-width: 768px) { .md\:text-5xl { font-size: 3rem; } }
+.text-xl { font-size: 1.25rem; }
+.w-12 { width: 3rem; }
+.h-12 { height: 3rem; }
+.rounded-full { border-radius: 9999px; }
+.object-cover { object-fit: cover; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.rounded-xl { border-radius: 0.75rem; }
+.prose { max-width: 65ch; }
+.border-t { border-top: 1px solid var(--border); }
+.border-l-4 { border-left-width: 4px; }
+.border-primary { border-color: var(--primary); }
+
+.category-pill {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: var(--primary);
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.tag-pill {
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.tag-pill:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.engagement-bar {
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(139, 92, 246, 0.3);
+  border-left-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

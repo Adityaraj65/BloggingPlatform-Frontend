@@ -1,0 +1,49 @@
+<footer class="footer">
+  <div class="container flex flex-col md:flex-row justify-between items-center py-8">
+    <div class="flex flex-col md:flex-row justify-between w-full gap-8 border-b border-secondary/20 pb-8">
+      <div class="footer-brand flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <div class="logo-icon-small"></div>
+          <span class="logo-text-small font-bold text-xl">InkWell</span>
+        </div>
+        <p class="text-secondary max-w-sm mt-2">Where ideas come to life. Share your thoughts, discover new perspectives, and connect with a global community of writers and readers.</p>
+      </div>
+      
+      <div class="footer-newsletter flex flex-col gap-3">
+        <h3 class="font-bold text-lg">Subscribe to our Newsletter</h3>
+        <p class="text-secondary text-sm">Get the latest posts delivered right to your inbox.</p>
+        <form class="flex gap-2 mt-2" (ngSubmit)="subscribeNewsletter()">
+          <input 
+            type="email" 
+            [(ngModel)]="email"
+            name="email"
+            placeholder="Your email address" 
+            class="form-input text-sm flex-1"
+            required>
+          <button type="submit" class="btn btn-primary btn-sm whitespace-nowrap" [disabled]="isSubscribing">
+            {{ isSubscribing ? 'Subscribing...' : 'Subscribe' }}
+          </button>
+        </form>
+        @if (successMessage) {
+          <p class="text-success text-xs">{{ successMessage }}</p>
+        }
+        @if (errorMessage) {
+          <p class="text-danger text-xs">{{ errorMessage }}</p>
+        }
+      </div>
+    </div>
+    
+    <div class="w-full flex flex-col md:flex-row justify-between items-center pt-8">
+      <div class="footer-links flex gap-6">
+        <a href="#" class="footer-link hover:text-primary transition-colors">About</a>
+        <a href="#" class="footer-link hover:text-primary transition-colors">Terms</a>
+        <a href="#" class="footer-link hover:text-primary transition-colors">Privacy Policy</a>
+        <a href="#" class="footer-link hover:text-primary transition-colors">Contact</a>
+      </div>
+    
+    <div class="footer-copy mt-4 md:mt-0 text-sm text-muted">
+      &copy; 2026 InkWell Platform. All rights reserved.
+    </div>
+  </div>
+</div>
+</footer>

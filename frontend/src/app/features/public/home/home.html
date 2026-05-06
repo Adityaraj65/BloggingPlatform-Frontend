@@ -1,0 +1,70 @@
+<div class="hero-section mb-8 animate-fade-in">
+  <div class="hero-content text-center py-12">
+    <h1 class="hero-title">
+      Discover stories, thinking, and expertise from writers on any topic.
+    </h1>
+    <p class="hero-subtitle mt-4 text-secondary">
+      InkWell is a place to write, read, and connect.
+    </p>
+    <div class="mt-8">
+      <button class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;" (click)="scrollToFeed()">Start Reading</button>
+    </div>
+  </div>
+</div>
+
+<div class="feed-section" id="latest-articles">
+  <div class="flex items-center justify-between mb-6 border-b pb-4">
+    <h2 class="text-2xl m-0">Latest Articles</h2>
+    
+    <div class="feed-filters flex gap-4">
+      @for (filter of filters; track filter) {
+        <button
+          class="filter-btn"
+          [class.active]="activeFilter === filter"
+          type="button"
+          (click)="selectFilter(filter)"
+        >
+          {{ filter }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @if (posts$ | async; as posts) {
+      @for (post of posts; track post.id) {
+        <app-post-card [post]="post"></app-post-card>
+      }
+    } @else {
+      <!-- Skeleton Loading State -->
+      @for (i of [1, 2, 3]; track i) {
+        <div class="card skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="p-4">
+            <div class="skeleton-avatar-row flex items-center gap-2 mb-4">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-text w-24"></div>
+            </div>
+            <div class="skeleton-text w-full mb-2"></div>
+            <div class="skeleton-text w-3/4 mb-4"></div>
+            <div class="skeleton-text w-full h-12"></div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<div class="newsletter-section mt-12 py-12 glass rounded-lg border">
+  <div class="text-center max-w-lg mx-auto px-4">
+    <h2 class="text-2xl mb-2">Subscribe to our newsletter</h2>
+    <p class="text-secondary mb-6">Get the latest posts delivered right to your inbox.</p>
+    <div class="flex gap-2">
+      <input type="email" placeholder="Your email address" class="flex-grow" [(ngModel)]="newsletterEmail" (keyup.enter)="subscribe()">
+      <button class="btn btn-primary" type="button" (click)="subscribe()">Subscribe</button>
+    </div>
+    @if (newsletterMessage) {
+      <p class="newsletter-message">{{ newsletterMessage }}</p>
+    }
+  </div>
+</div>

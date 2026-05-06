@@ -1,0 +1,44 @@
+.min-h-\[calc\(100vh-4rem\)\] {
+  min-height: calc(100vh - 4rem);
+}
+
+.max-w-md {
+  max-width: 28rem;
+}
+
+.auth-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: 0 4px 20px var(--primary-glow);
+}
+
+.auth-divider {
+  position: relative;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--border);
+  z-index: 0;
+}
+
+.auth-divider span {
+  position: relative;
+  z-index: 1;
+  background-color: var(--bg-surface);
+}
+
+.bg-surface {
+  background-color: var(--bg-surface);
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
