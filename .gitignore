@@ -1,0 +1,117 @@
+# ======================================================
+# Angular + Node.js .gitignore
+# For Windows + VS Code + IntelliJ + Eclipse + STS
+# ======================================================
+
+# =========================
+# Dependencies
+# =========================
+node_modules/
+
+# =========================
+# Build output
+# =========================
+dist/
+out-tsc/
+tmp/
+build/
+
+# Angular cache
+.angular/
+
+# =========================
+# Logs
+# =========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+!.env.example
+
+# Angular environments (optional)
+# Uncomment if you don't want env files in git
+# src/environments/*.ts
+
+# =========================
+# Coverage / Testing
+# =========================
+coverage/
+.nyc_output/
+
+# =========================
+# VS Code
+# =========================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# =========================
+# IntelliJ / WebStorm
+# =========================
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# =========================
+# Eclipse / STS
+# =========================
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# =========================
+# OS files (Windows)
+# =========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =========================
+# Package manager caches
+# =========================
+.npm/
+.pnpm-store/
+.yarn/
+package-lock.json.bak
+
+# =========================
+# Optional: Firebase / Netlify / Vercel
+# =========================
+.firebase/
+.vercel/
+.netlify/
+
+# =========================
+# Optional: Docker
+# =========================
+.docker/
+
+# =========================
+# Misc
+# =========================
+.cache/
+.sass-cache/
+.eslintcache
