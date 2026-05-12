@@ -1,131 +1,259 @@
-<div class="min-h-[calc(100vh-4rem)] py-8 px-4">
-  <div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2">{{ isEditMode ? 'Edit Post' : 'Create New Post' }}</h1>
-      <p class="text-secondary">Share your thoughts with the community</p>
+<div class="editor-page">
+
+  <div class="editor-container">
+
+    <!-- HEADER -->
+
+    <div class="editor-header">
+
+      <div>
+
+        <h1 class="editor-title">
+          {{
+            isEditMode
+              ? 'Edit Story'
+              : 'Create Story'
+          }}
+        </h1>
+
+        <p class="editor-subtitle">
+          Share your ideas with the world
+        </p>
+
+      </div>
+
     </div>
 
-    <!-- Error Message -->
+    <!-- ERROR -->
+
     @if (error) {
-      <div class="bg-danger/10 border border-danger/20 text-danger p-4 rounded-md mb-6">
+
+      <div class="editor-error">
         {{ error }}
       </div>
+
     }
 
-    <!-- Form -->
-    <form class="space-y-6" (ngSubmit)="onSubmit()">
-      <!-- Title -->
-      <div class="form-group">
-        <label for="title" class="form-label block text-sm font-medium mb-2">Title</label>
-        <input 
-          type="text" 
-          id="title" 
-          name="title" 
-          [(ngModel)]="post.title" 
-          placeholder="Enter a compelling title"
-          class="form-input w-full"
-          required
-          minlength="5"
-          maxlength="200"
+    <!-- SUCCESS -->
+
+    @if (successMessage) {
+
+      <div class="editor-success">
+        {{ successMessage }}
+      </div>
+
+    }
+
+    @if (loading) {
+
+      <div class="editor-loading">
+        Loading story...
+      </div>
+
+    } @else if (accessDenied) {
+
+      <div class="editor-access-actions">
+
+        <button
+          type="button"
+          class="cancel-btn"
+          (click)="goBack()"
         >
-        <p class="text-xs text-muted mt-1">Must be between 5 and 200 characters</p>
+          Back to Dashboard
+        </button>
+
       </div>
 
-      <!-- Excerpt -->
-      <div class="form-group">
-        <label for="excerpt" class="form-label block text-sm font-medium mb-2">Excerpt</label>
-        <textarea 
-          id="excerpt" 
-          name="excerpt" 
-          [(ngModel)]="post.excerpt" 
-          placeholder="Brief description of your post (optional)"
-          class="form-input w-full"
-          rows="3"
-          maxlength="500"
-        ></textarea>
-        <p class="text-xs text-muted mt-1">Maximum 500 characters</p>
-      </div>
+    } @else {
 
-      <!-- Content -->
-      <div class="form-group">
-        <label for="content" class="form-label block text-sm font-medium mb-2">Content</label>
-        <textarea 
-          id="content" 
-          name="content" 
-          [(ngModel)]="post.content" 
-          placeholder="Write your post content here..."
-          class="form-input w-full"
-          rows="15"
-          required
-          minlength="50"
-        ></textarea>
-        <p class="text-xs text-muted mt-1">Must be at least 50 characters</p>
-      </div>
+      <!-- FORM -->
 
-      <!-- Featured Image URL -->
-      <div class="form-group">
-        <label class="form-label block text-sm font-medium mb-2">Featured Image</label>
-        <div class="flex flex-col gap-3">
-          <div class="flex gap-4 items-center">
-            <input 
-              type="url" 
-              id="featuredImageUrl" 
-              name="featuredImageUrl" 
-              [(ngModel)]="post.featuredImageUrl" 
-              placeholder="https://example.com/image.jpg"
-              class="form-input flex-1"
-            >
-            <span class="text-secondary text-sm font-medium">OR</span>
-            <label class="btn btn-outline cursor-pointer relative" [class.opacity-50]="uploadingImage">
-              {{ uploadingImage ? 'Uploading...' : 'Upload Image' }}
-              <input type="file" class="hidden" accept="image/*" (change)="onFileSelected($event)" [disabled]="uploadingImage">
-            </label>
-          </div>
-          @if (post.featuredImageUrl) {
-            <div class="relative w-32 h-20 rounded overflow-hidden border border-primary/20">
-              <img [src]="post.featuredImageUrl" class="w-full h-full object-cover">
-            </div>
-          }
+      <form
+        class="editor-form"
+        (ngSubmit)="onSubmit()"
+      >
+
+        <!-- COVER IMAGE -->
+
+        <div class="form-group">
+
+          <label>
+            Cover Image URL
+          </label>
+
+          <input
+            type="url"
+            class="editor-input"
+            [(ngModel)]="post.featuredImageUrl"
+            (ngModelChange)="onFeaturedImageChange()"
+            name="featuredImageUrl"
+            placeholder="https://example.com/image.jpg"
+          >
+
         </div>
-        <p class="text-xs text-muted mt-1">Optional: Provide an image URL or upload a file</p>
-      </div>
 
-      <!-- Category -->
-      <div class="form-group">
-        <label for="categoryId" class="form-label block text-sm font-medium mb-2">Category</label>
-        <select 
-          id="categoryId" 
-          name="categoryId" 
-          [(ngModel)]="post.categoryId" 
-          class="form-input w-full"
-        >
-          <option [ngValue]="null">Select a category (optional)</option>
-          @for (category of categories; track category.categoryId) {
-            <option [ngValue]="category.categoryId">{{ category.name }}</option>
-          }
-        </select>
-      </div>
+        <!-- IMAGE PREVIEW -->
 
-      <!-- Actions -->
-      <div class="flex gap-4 pt-6">
-        <button 
-          type="submit" 
-          class="btn btn-primary flex-1"
-          [disabled]="saving || loading"
-        >
-          {{ saving ? 'Saving...' : (isEditMode ? 'Update Post' : 'Publish Post') }}
-        </button>
-        
-        <button 
-          type="button" 
-          class="btn btn-secondary"
-          (click)="router.navigate(['/author/dashboard'])"
-          [disabled]="saving"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+        @if (post.featuredImageUrl?.trim()) {
+
+          <div class="image-preview-wrapper">
+
+            <img
+              [src]="post.featuredImageUrl"
+              class="image-preview"
+              alt="Cover image preview"
+              (load)="onImageLoad($event)"
+              (error)="onImageError($event)"
+            >
+
+            @if (imagePreviewError) {
+
+              <div class="image-preview-error">
+                This image URL could not be loaded.
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+        <!-- TITLE -->
+
+        <div class="form-group">
+
+          <label>
+            Story Title
+          </label>
+
+          <input
+            type="text"
+            class="editor-input"
+            [(ngModel)]="post.title"
+            name="title"
+            placeholder="Enter story title"
+          >
+
+        </div>
+
+        <!-- EXCERPT -->
+
+        <div class="form-group">
+
+          <label>
+            Short Description
+          </label>
+
+          <textarea
+            class="editor-textarea"
+            [(ngModel)]="post.excerpt"
+            name="excerpt"
+            rows="3"
+            placeholder="Write short description"
+          ></textarea>
+
+        </div>
+
+        <!-- CATEGORY -->
+
+        <div class="form-group">
+
+          <label>
+            Category
+          </label>
+
+          <select
+            class="editor-select"
+            [(ngModel)]="post.categoryId"
+            name="categoryId"
+          >
+
+            <option [ngValue]="null">
+              No Category
+            </option>
+
+            @for (
+              category of categories;
+              track category.categoryId
+            ) {
+
+              <option
+                [ngValue]="category.categoryId"
+              >
+                {{ category.name }}
+              </option>
+
+            }
+
+          </select>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="form-group">
+
+          <label>
+            Story Content
+          </label>
+
+          <textarea
+            class="editor-content"
+            [(ngModel)]="post.content"
+            name="content"
+            rows="14"
+            placeholder="Write your story..."
+          ></textarea>
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="editor-actions">
+
+          <button
+            type="button"
+            class="cancel-btn"
+            (click)="goBack()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="draft-btn"
+            [disabled]="saving"
+            (click)="saveDraft()"
+          >
+            {{
+              saving
+                ? 'Saving...'
+                : 'Save Draft'
+            }}
+          </button>
+
+          <button
+            type="submit"
+            class="publish-btn"
+            [disabled]="saving"
+          >
+            {{
+              saving
+                ? 'Publishing...'
+                : (
+                    isEditMode
+                      ? 'Update & Publish'
+                      : 'Publish Story'
+                  )
+            }}
+          </button>
+
+        </div>
+
+      </form>
+
+    }
+
   </div>
+
 </div>

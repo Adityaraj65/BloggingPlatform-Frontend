@@ -1,44 +1,95 @@
-<article class="post-card glass rounded-2xl overflow-hidden hover-lift flex flex-col h-full animate-fade-in" [routerLink]="['/post', post.slug]">
-  <div class="relative h-48 overflow-hidden">
-    @if (post.featuredImageUrl) {
-      <img [src]="post.featuredImageUrl" [alt]="post.title" class="post-image w-full h-full object-cover">
-    } @else {
-      <div class="w-full h-full bg-surface-hover flex items-center justify-center">
-        <span class="text-muted">No Image</span>
+<div class="post-card">
+
+  <a
+    [routerLink]="['/post', post.slug]"
+    class="post-image-wrapper"
+  >
+
+    <img
+      [src]="post.featuredImageUrl || fallbackPostImage"
+      [alt]="post.title"
+      class="post-image"
+      (error)="onImageError($event)"
+    >
+
+  </a>
+
+  <div class="post-content">
+
+    <!-- AUTHOR -->
+
+    <div class="post-author">
+
+      <img
+        [src]="avatarUrl"
+        class="author-avatar"
+        (error)="onAvatarError($event)"
+      >
+
+      <div>
+
+        <div class="author-name">
+          {{ authorName }}
+        </div>
+
+        <div class="post-meta">
+          {{ (post.publishedAt || post.createdAt) | date:'mediumDate' }}
+          .
+          {{ post.readTimeMin || 1 }} min read
+        </div>
+
       </div>
-    }
-    <div class="absolute top-4 left-4">
-      <span class="category-badge">{{ post.categories[0] }}</span>
+
     </div>
-  </div>
-  
-  <div class="p-6 flex flex-col flex-grow">
-    <div class="flex items-center gap-3 mb-4">
-      <img [src]="post.author.avatar" [alt]="post.author.name" class="w-8 h-8 rounded-full">
-      <div class="text-sm">
-        <div class="font-medium text-primary">{{ post.author.name }}</div>
-        <div class="text-muted text-xs">{{ post.createdAt | date }} · {{ post.readTime }} min read</div>
+
+    <!-- TITLE -->
+
+    <a
+      [routerLink]="['/post', post.slug]"
+      class="post-title-link"
+    >
+
+      <h2 class="post-title">
+        {{ post.title }}
+      </h2>
+
+    </a>
+
+    <!-- EXCERPT -->
+
+    <p class="post-excerpt">
+      {{
+        post.excerpt
+        || (post.content | slice:0:120)
+      }}...
+    </p>
+
+    <!-- FOOTER -->
+
+    <div class="post-footer">
+
+      <div class="post-category">
+        {{ displayCategory }}
       </div>
-    </div>
-    
-    <h3 class="text-xl font-bold mb-2 line-clamp-2 leading-tight">{{ post.title }}</h3>
-    <p class="text-secondary text-sm mb-6 line-clamp-3 flex-grow">{{ post.excerpt }}</p>
-    
-    <div class="flex items-center justify-between text-muted text-sm mt-auto pt-4 border-t border-white/5">
-      <div class="flex gap-4">
-        <span class="flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-          {{ post.likesCount }}
+
+      <div class="post-stats">
+
+        <span class="stat-item">
+          Likes {{ post.likesCount || 0 }}
         </span>
-        <span class="flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          {{ post.commentCount }}
+
+        <span class="stat-item">
+          Comments {{ post.commentCount || 0 }}
         </span>
+
+        <span class="stat-item">
+          Views {{ post.viewCount || 0 }}
+        </span>
+
       </div>
-      <span class="font-medium text-primary flex items-center gap-1">
-        Read
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </span>
+
     </div>
+
   </div>
-</article>
+
+</div>

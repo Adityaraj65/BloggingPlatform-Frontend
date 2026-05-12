@@ -1,70 +1,154 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {
+  Injectable,
+  inject
+} from '@angular/core';
 
-const API_URL = 'http://localhost:8080/comments';
+import {
+  HttpClient
+} from '@angular/common/http';
+
+import {
+  Observable
+} from 'rxjs';
+
+const API_URL =
+  'http://localhost:8080/comments';
+
+// ================= REQUEST DTO =================
 
 export interface CommentRequestDTO {
+
   postId: number;
-  userId: number;
+
+  authorId: number;
+
+  authorName: string;
+
+  authorUsername: string;
+
+  authorAvatar?: string;
+
   content: string;
+
   parentCommentId?: number;
 }
 
+// ================= RESPONSE DTO =================
+
 export interface CommentResponseDTO {
+
   commentId: number;
+
   postId: number;
-  userId: number;
+
+  authorId: number;
+
+  authorName?: string;
+
+  authorUsername?: string;
+
+  authorAvatar?: string;
+
   content: string;
+
   createdAt: string;
+
   status: string;
-  parentCommentId?: number;
+
   likesCount: number;
+
+  parentCommentId?: number;
+
+  replies?: CommentResponseDTO[];
 }
+
+// ================= SERVICE =================
 
 @Injectable({
   providedIn: 'root',
 })
 export class Comment {
-  private http = inject(HttpClient);
 
-  addComment(comment: CommentRequestDTO): Observable<CommentResponseDTO> {
-    return this.http.post<CommentResponseDTO>(API_URL, comment);
+  private http =
+    inject(HttpClient);
+
+  // ================= ADD COMMENT =================
+
+  addComment(
+    comment: CommentRequestDTO
+  ): Observable<CommentResponseDTO> {
+
+    return this.http.post<CommentResponseDTO>(
+      API_URL,
+      comment
+    );
   }
 
-  getCommentsByPost(postId: number): Observable<CommentResponseDTO[]> {
-    return this.http.get<CommentResponseDTO[]>(`${API_URL}/post/${postId}`);
+  // ================= DELETE COMMENT =================
+
+  deleteComment(
+    id: number
+  ): Observable<void> {
+
+    return this.http.delete<void>(
+      `${API_URL}/${id}`
+    );
   }
 
-  getReplies(id: number): Observable<CommentResponseDTO[]> {
-    return this.http.get<CommentResponseDTO[]>(`${API_URL}/replies/${id}`);
+  // ================= GET COMMENTS =================
+
+  getCommentsByPost(
+    postId: number
+  ): Observable<CommentResponseDTO[]> {
+
+    return this.http.get<CommentResponseDTO[]>(
+      `${API_URL}/post/${postId}`
+    );
   }
 
-  updateComment(id: number, content: string): Observable<CommentResponseDTO> {
-    return this.http.put<CommentResponseDTO>(`${API_URL}/${id}?content=${encodeURIComponent(content)}`, {});
+  // ================= GET REPLIES =================
+
+  getReplies(
+    id: number
+  ): Observable<CommentResponseDTO[]> {
+
+    return this.http.get<CommentResponseDTO[]>(
+      `${API_URL}/replies/${id}`
+    );
   }
 
-  deleteComment(id: number): Observable<void> {
-    return this.http.delete<void>(`${API_URL}/${id}`);
+  // ================= LIKE COMMENT =================
+
+  likeComment(
+    id: number
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${API_URL}/like/${id}`,
+      {}
+    );
   }
 
-  approveComment(id: number): Observable<void> {
-    return this.http.put<void>(`${API_URL}/approve/${id}`, {});
+  // ================= UNLIKE COMMENT =================
+
+  unlikeComment(
+    id: number
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${API_URL}/unlike/${id}`,
+      {}
+    );
   }
 
-  rejectComment(id: number): Observable<void> {
-    return this.http.put<void>(`${API_URL}/reject/${id}`, {});
-  }
+  // ================= COMMENT COUNT =================
 
-  likeComment(id: number): Observable<void> {
-    return this.http.put<void>(`${API_URL}/like/${id}`, {});
-  }
+  getCommentCount(
+    postId: number
+  ): Observable<number> {
 
-  unlikeComment(id: number): Observable<void> {
-    return this.http.put<void>(`${API_URL}/unlike/${id}`, {});
-  }
-
-  getCommentCount(postId: number): Observable<number> {
-    return this.http.get<number>(`${API_URL}/count/${postId}`);
+    return this.http.get<number>(
+      `${API_URL}/count/${postId}`
+    );
   }
 }

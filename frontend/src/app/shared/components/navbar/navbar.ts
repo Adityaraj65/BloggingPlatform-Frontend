@@ -1,68 +1,195 @@
-import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit, HostListener } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { AuthService, UserResponse } from '../../../core/services/auth';
-import { Notification, NotificationDTO } from '../../../core/services/notification';
-import { OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+import {
+  AuthService
+} from '../../../core/services/auth';
+
+import {
+  Notification,
+  NotificationDTO
+} from '../../../core/services/notification';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, AsyncPipe, CommonModule],
+  standalone: true,
+  imports: [
+    RouterLink,
+    AsyncPipe,
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  styleUrl: './navbar.css'
 })
 export class Navbar implements OnInit {
+
   private authService = inject(AuthService);
-  private notificationService = inject(Notification);
-  
-  currentUser$ = this.authService.currentUser$;
+
+  private router = inject(Router);
+
+  private notificationService =
+    inject(Notification);
+
+  currentUser$ =
+    this.authService.currentUser$;
+
   notifications: NotificationDTO[] = [];
+
   unreadCount = 0;
+
   showNotifications = false;
 
-  ngOnInit() {
-    this.currentUser$.subscribe(user => {
-      if (user) {
-        this.loadNotifications(user.id);
-      } else {
-        this.notifications = [];
-        this.unreadCount = 0;
+  showProfileMenu = false;
+
+  searchQuery = '';
+
+  ngOnInit(): void {
+
+    this.currentUser$.subscribe({
+
+      next: (user) => {
+
+        if (user?.id) {
+
+          this.loadNotifications(user.id);
+
+        } else {
+
+          this.notifications = [];
+
+          this.unreadCount = 0;
+        }
+      },
+
+      error: (err) => {
+
+        console.error(
+          'Navbar user load failed',
+          err
+        );
       }
     });
   }
 
-  loadNotifications(userId: number) {
-    this.notificationService.getByRecipient(userId).subscribe({
-      next: (notifs) => {
-        this.notifications = notifs;
-        this.unreadCount = notifs.filter(n => !n.isRead).length;
-      },
-      error: (err) => console.error('Failed to load notifications', err)
-    });
+  loadNotifications(userId: number): void {
+
+    this.notificationService
+      .getByRecipient(userId)
+      .subscribe({
+
+        next: (data) => {
+
+          this.notifications = data || [];
+
+          this.unreadCount =
+            this.notifications.filter(
+              n => !n.isRead
+            ).length;
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Notification load failed',
+            err
+          );
+        }
+      });
   }
 
-  toggleNotifications() {
-    this.showNotifications = !this.showNotifications;
-    if (this.showNotifications && this.unreadCount > 0) {
-      this.currentUser$.subscribe(user => {
-        if (user) {
-          this.notificationService.markAllRead(user.id).subscribe(() => {
-            this.unreadCount = 0;
-            this.notifications.forEach(n => n.isRead = true);
-          });
+  toggleNotifications(event: MouseEvent): void {
+
+    event.stopPropagation();
+
+    this.showNotifications =
+      !this.showNotifications;
+
+    this.showProfileMenu = false;
+
+    if (
+      this.showNotifications &&
+      this.unreadCount > 0
+    ) {
+
+      this.currentUser$.subscribe({
+
+        next: (user) => {
+
+          if (user?.id) {
+
+            this.notificationService
+              .markAllRead(user.id)
+              .subscribe({
+
+                next: () => {
+
+                  this.notifications.forEach(
+                    n => n.isRead = true
+                  );
+
+                  this.unreadCount = 0;
+                },
+
+                error: (err) => {
+
+                  console.error(
+                    'Mark read failed',
+                    err
+                  );
+                }
+              });
+          }
         }
-      }).unsubscribe();
+      });
     }
   }
-  
-  logout() {
-    console.log('Logout clicked');
+
+  toggleProfileMenu(event: MouseEvent): void {
+
+    event.stopPropagation();
+
+    this.showProfileMenu =
+      !this.showProfileMenu;
+
+    this.showNotifications = false;
+  }
+
+  @HostListener('document:click')
+  closeMenus(): void {
+
+    this.showNotifications = false;
+
+    this.showProfileMenu = false;
+  }
+
+  logout(): void {
+
     this.authService.logout();
-    // Force redirect to login page after logout
+
     window.location.href = '/login';
   }
-  
-  isLoggedIn(): boolean {
-    return this.authService.isLoggedIn();
+
+  searchPosts(): void {
+
+    const query =
+      this.searchQuery.trim();
+
+    this.router.navigate(
+      ['/'],
+      {
+        queryParams: query
+          ? { search: query }
+          : {}
+      }
+    );
+  }
+
+  canWrite(role: string): boolean {
+
+    return role === 'AUTHOR'
+      || role === 'ADMIN';
   }
 }
