@@ -303,6 +303,63 @@ body {
     rgba(255, 255, 255, 0.08);
 }
 
+/* OAuth BUTTON */
+.oauth-button {
+
+  width: 100%;
+  height: 56px;
+
+  border: none;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.06);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  color: white;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.8rem;
+
+  margin-bottom: 1.5rem;
+}
+
+.oauth-button:hover {
+
+  background:
+    rgba(255, 255, 255, 0.1);
+
+  border-color: rgba(255, 255, 255, 0.15);
+
+  transform: translateY(-1px);
+}
+
+.oauth-button:active {
+  transform: scale(0.98);
+}
+
+.google-button {
+  /* Enhanced styling for Google button */
+}
+
+.google-button svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* FOOTER */
 .auth-footer {
 

@@ -10,13 +10,14 @@ import {
 } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [RouterModule, FormsModule],
+  imports: [RouterModule, FormsModule, CommonModule],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
@@ -80,7 +81,7 @@ export class Register {
 
           this.cdr.detectChanges();
 
-          this.router.navigate(['/login']);
+          this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
         },
 
         error: (err) => {
@@ -159,5 +160,12 @@ export class Register {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  // ================= GOOGLE OAUTH SIGNUP =================
+
+  loginWithGoogle(): void {
+    // Redirect to OAuth2 authorization endpoint
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   }
 }

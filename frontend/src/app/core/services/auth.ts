@@ -107,6 +107,33 @@ export class AuthService {
     );
   }
 
+  // ================= EMAIL & PASSWORD =================
+
+  verifyEmail(token: string): Observable<any> {
+    return this.http.get(`${API_URL}/verify-email`, {
+      params: { token },
+      responseType: 'text'
+    });
+  }
+
+  resendVerification(email: string): Observable<any> {
+    return this.http.post(`${API_URL}/resend-verification?email=${encodeURIComponent(email)}`, null, {
+      responseType: 'text'
+    });
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${API_URL}/forgot-password`, { email }, {
+      responseType: 'text'
+    });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(`${API_URL}/reset-password`, { token, newPassword }, {
+      responseType: 'text'
+    });
+  }
+
   // ================= LOGOUT =================
 
   logout(): void {
@@ -137,7 +164,7 @@ export class AuthService {
 
   // ================= TOKEN PARSER =================
 
-  private setUserFromToken(
+  setUserFromToken(
   token: string
 ): void {
 

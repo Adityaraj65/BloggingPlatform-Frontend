@@ -1,14 +1,16 @@
 import {
   Component,
   inject,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  OnInit
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
 import {
   RouterModule,
-  Router
+  Router,
+  ActivatedRoute
 } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
@@ -26,7 +28,7 @@ import { AuthService } from '../../../core/services/auth';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnInit {
 
   private authService =
     inject(AuthService);
@@ -37,6 +39,9 @@ export class Login {
   private cdr =
     inject(ChangeDetectorRef);
 
+  private route =
+    inject(ActivatedRoute);
+
   credentials = {
 
     identifier: '',
@@ -45,8 +50,18 @@ export class Login {
   };
 
   error = '';
+  message = '';
 
   loading = false;
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['registered']) {
+        this.message = 'Registration successful. Please verify your email before logging in.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   onSubmit(): void {
 
@@ -208,5 +223,33 @@ export class Login {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  // ================= GOOGLE OAUTH LOGIN =================
+
+  loginWithGoogle(): void {
+    // Redirect to OAuth2 authorization endpoint
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  }
+
+  // ================= RESEND VERIFICATION =================
+  resendVerification(): void {
+    this.error = '';
+    this.message = '';
+    this.loading = true;
+    this.cdr.detectChanges();
+
+    this.authService.resendVerification(this.credentials.identifier).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.message = res || 'Verification email resent successfully.';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err.error || 'Failed to resend verification email.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

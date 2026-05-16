@@ -1,41 +1,108 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {
+  Injectable,
+  inject
+} from '@angular/core';
 
-const API_URL = 'http://localhost:8080/notifications';
+import {
+  HttpClient
+} from '@angular/common/http';
+
+import {
+  Observable
+} from 'rxjs';
+
+const API_URL =
+  'http://localhost:8085/notifications';
+
+// ================= DTO =================
 
 export interface NotificationDTO {
+
   notificationId: number;
+
   recipientId: number;
+
+  actorId: number;
+
+  type: string;
+
   title: string;
+
   message: string;
+
+  relatedId: number;
+
+  relatedType: string;
+
   isRead: boolean;
+
   createdAt: string;
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class Notification {
-  private http = inject(HttpClient);
 
-  getByRecipient(id: number): Observable<NotificationDTO[]> {
-    return this.http.get<NotificationDTO[]>(`${API_URL}/recipient/${id}`);
+  private http =
+    inject(HttpClient);
+
+  // ================= GET =================
+
+  getByRecipient(
+    userId: number
+  ): Observable<NotificationDTO[]> {
+
+    return this.http.get<
+      NotificationDTO[]
+    >(
+      `${API_URL}/recipient/${userId}`
+    );
   }
 
-  markAllRead(recipientId: number): Observable<void> {
-    return this.http.put<void>(`${API_URL}/mark-all-read?recipientId=${recipientId}`, {});
+  // ================= UNREAD =================
+
+  getUnreadCount(
+    userId: number
+  ): Observable<number> {
+
+    return this.http.get<number>(
+      `${API_URL}/unread-count/${userId}`
+    );
   }
 
-  getUnreadCount(id: number): Observable<number> {
-    return this.http.get<number>(`${API_URL}/unread-count/${id}`);
+  // ================= MARK ALL READ =================
+
+  markAllRead(
+    userId: number
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${API_URL}/mark-all-read?recipientId=${userId}`,
+      {}
+    );
   }
 
-  sendBulk(ids: number[], title: string, msg: string): Observable<void> {
-    return this.http.post<void>(`${API_URL}/send-bulk?title=${encodeURIComponent(title)}&msg=${encodeURIComponent(msg)}`, ids);
+  // ================= MARK READ =================
+
+  markRead(
+    id: number
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${API_URL}/mark-read/${id}`,
+      {}
+    );
   }
 
-  deleteRead(recipientId: number): Observable<void> {
-    return this.http.delete<void>(`${API_URL}/delete-read?recipientId=${recipientId}`);
+  // ================= DELETE =================
+
+  deleteNotification(
+    id: number
+  ): Observable<void> {
+
+    return this.http.delete<void>(
+      `${API_URL}/${id}`
+    );
   }
 }

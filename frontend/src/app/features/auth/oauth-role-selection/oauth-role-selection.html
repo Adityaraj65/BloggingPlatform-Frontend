@@ -1,0 +1,79 @@
+<div class="role-selection-page">
+  
+  <div class="role-selection-card">
+    
+    <!-- Header -->
+    <div class="role-header">
+      <h1 class="role-title">Choose Your Account Type</h1>
+      <p class="role-subtitle">Select the role that best fits your needs</p>
+    </div>
+
+    <!-- Error Message -->
+    @if (error) {
+      <div class="role-error">
+        {{ error }}
+      </div>
+    }
+
+    <!-- Role Options -->
+    <div class="role-options">
+      @for (role of roles; track role.id) {
+        <div 
+          class="role-card"
+          [class.selected]="selectedRole === role.id"
+          [class.disabled]="loading && selectedRole !== role.id"
+        >
+          <button
+            type="button"
+            class="role-button"
+            (click)="selectRole(role.id)"
+            [disabled]="loading"
+          >
+            <!-- Icon -->
+            <div class="role-icon">
+              {{ role.icon }}
+            </div>
+
+            <!-- Role Name -->
+            <h2 class="role-name">
+              {{ role.name }}
+            </h2>
+
+            <!-- Description -->
+            <p class="role-description">
+              {{ role.description }}
+            </p>
+
+            <!-- Features List -->
+            <ul class="role-features">
+              @for (feature of role.features; track feature) {
+                <li class="role-feature">
+                  {{ feature }}
+                </li>
+              }
+            </ul>
+
+            <!-- Button State -->
+            @if (selectedRole === role.id && loading) {
+              <div class="role-loading">
+                <div class="spinner"></div>
+                <span>Setting up your account...</span>
+              </div>
+            } @else {
+              <div class="role-cta">
+                Choose {{ role.name }}
+              </div>
+            }
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Info Text -->
+    <p class="role-info">
+      You can always change your role later in your account settings.
+    </p>
+
+  </div>
+
+</div>

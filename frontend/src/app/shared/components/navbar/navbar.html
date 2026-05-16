@@ -116,39 +116,62 @@
 
               </div>
 
-              <div class="notification-list">
+<div class="notification-list">
 
-                @for (
-                  notif of notifications;
-                  track notif.notificationId
-                ) {
+  @for (
+    notif of notifications;
+    track notif.notificationId
+  ) {
 
-                  <div
-                    class="notification-item"
-                    [class.unread]="!notif.isRead"
-                  >
+    <div
+      class="notification-item"
+      [class.unread]="!notif.isRead"
+    >
 
-                    <div class="notification-title">
-                      {{ notif.title }}
-                    </div>
+      <div class="notification-top">
 
-                    <div class="notification-message">
-                      {{ notif.message }}
-                    </div>
+        <div class="notification-title">
+          {{ notif.title }}
+        </div>
 
-                  </div>
+        <button
+          class="delete-notification-btn"
+          (click)="deleteNotification(
+            notif.notificationId,
+            $event
+          )"
+        >
+          ✕
+        </button>
 
-                } @empty {
+      </div>
 
-                  <div class="empty-notification">
+      <div class="notification-message">
+        {{ notif.message }}
+      </div>
 
-                    No notifications
+      <div class="notification-time">
 
-                  </div>
+        {{
+          notif.createdAt
+          | date:'medium'
+        }}
 
-                }
+      </div>
 
-              </div>
+    </div>
+
+  } @empty {
+
+    <div class="empty-notification">
+
+      No notifications
+
+    </div>
+
+  }
+
+</div>
 
             </div>
 

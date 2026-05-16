@@ -1,7 +1,30 @@
-import { Component, inject, OnInit, HostListener } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { AsyncPipe, CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  Component,
+  inject,
+  OnInit,
+  HostListener,
+  ChangeDetectorRef,
+  OnDestroy
+} from '@angular/core';
+
+import {
+  Router,
+  RouterLink
+} from '@angular/router';
+
+import {
+  AsyncPipe,
+  CommonModule
+} from '@angular/common';
+
+import {
+  FormsModule
+} from '@angular/forms';
+
+import {
+  interval,
+  Subscription
+} from 'rxjs';
 
 import {
   AuthService
@@ -24,57 +47,114 @@ import {
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
-export class Navbar implements OnInit {
+export class Navbar
+  implements OnInit, OnDestroy {
 
-  private authService = inject(AuthService);
+  // ================= INJECT =================
 
-  private router = inject(Router);
+  private authService =
+    inject(AuthService);
+
+  private router =
+    inject(Router);
 
   private notificationService =
     inject(Notification);
 
+  private cdr =
+    inject(ChangeDetectorRef);
+
+  // ================= USER =================
+
   currentUser$ =
     this.authService.currentUser$;
 
-  notifications: NotificationDTO[] = [];
+  // ================= NOTIFICATIONS =================
+
+  notifications:
+    NotificationDTO[] = [];
 
   unreadCount = 0;
 
   showNotifications = false;
 
+  // ================= PROFILE =================
+
   showProfileMenu = false;
+
+  // ================= SEARCH =================
 
   searchQuery = '';
 
+  // ================= POLLING =================
+
+  private pollingSubscription?:
+    Subscription;
+
+  // ================= INIT =================
+
   ngOnInit(): void {
 
-    this.currentUser$.subscribe({
+    this.currentUser$
+      .subscribe({
 
-      next: (user) => {
+        next: (user) => {
 
-        if (user?.id) {
+          if (user?.id) {
 
-          this.loadNotifications(user.id);
+            // ================= INITIAL LOAD =================
 
-        } else {
+            this.loadNotifications(
+              user.id
+            );
 
-          this.notifications = [];
+            // ================= CLEAR OLD POLLING =================
 
-          this.unreadCount = 0;
+            this.pollingSubscription
+              ?.unsubscribe();
+
+            // ================= AUTO REFRESH =================
+
+            this.pollingSubscription =
+              interval(10000)
+                .subscribe(() => {
+
+                  this.loadNotifications(
+                    user.id
+                  );
+                });
+
+          } else {
+
+            this.notifications = [];
+
+            this.unreadCount = 0;
+          }
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Navbar user load failed',
+            err
+          );
         }
-      },
-
-      error: (err) => {
-
-        console.error(
-          'Navbar user load failed',
-          err
-        );
-      }
-    });
+      });
   }
 
-  loadNotifications(userId: number): void {
+  // ================= DESTROY =================
+
+  ngOnDestroy(): void {
+
+    this.pollingSubscription
+      ?.unsubscribe();
+  }
+
+  // ================= LOAD =================
+
+  loadNotifications(
+    userId: number
+  ): void {
 
     this.notificationService
       .getByRecipient(userId)
@@ -82,12 +162,34 @@ export class Navbar implements OnInit {
 
         next: (data) => {
 
-          this.notifications = data || [];
+          // ================= SORT LATEST FIRST =================
+
+          this.notifications =
+            (data || []).sort(
+
+              (a, b) =>
+
+                new Date(
+                  b.createdAt
+                ).getTime()
+
+                -
+
+                new Date(
+                  a.createdAt
+                ).getTime()
+            );
+
+          // ================= UNREAD COUNT =================
 
           this.unreadCount =
             this.notifications.filter(
               n => !n.isRead
             ).length;
+
+          // ================= FIX NG0100 =================
+
+          this.cdr.detectChanges();
         },
 
         error: (err) => {
@@ -100,7 +202,11 @@ export class Navbar implements OnInit {
       });
   }
 
-  toggleNotifications(event: MouseEvent): void {
+  // ================= TOGGLE NOTIFICATIONS =================
+
+  toggleNotifications(
+    event: MouseEvent
+  ): void {
 
     event.stopPropagation();
 
@@ -114,40 +220,88 @@ export class Navbar implements OnInit {
       this.unreadCount > 0
     ) {
 
-      this.currentUser$.subscribe({
+      this.currentUser$
+        .subscribe({
 
-        next: (user) => {
+          next: (user) => {
 
-          if (user?.id) {
+            if (user?.id) {
 
-            this.notificationService
-              .markAllRead(user.id)
-              .subscribe({
+              this.notificationService
+                .markAllRead(user.id)
+                .subscribe({
 
-                next: () => {
+                  next: () => {
 
-                  this.notifications.forEach(
-                    n => n.isRead = true
-                  );
+                    this.notifications
+                      .forEach(n => {
 
-                  this.unreadCount = 0;
-                },
+                        n.isRead = true;
+                      });
 
-                error: (err) => {
+                    this.unreadCount = 0;
 
-                  console.error(
-                    'Mark read failed',
-                    err
-                  );
-                }
-              });
+                    this.cdr.detectChanges();
+                  },
+
+                  error: (err) => {
+
+                    console.error(
+                      'Mark read failed',
+                      err
+                    );
+                  }
+                });
+            }
           }
-        }
-      });
+        });
     }
   }
 
-  toggleProfileMenu(event: MouseEvent): void {
+  // ================= DELETE =================
+
+  deleteNotification(
+    id: number,
+    event: MouseEvent
+  ): void {
+
+    event.stopPropagation();
+
+    this.notificationService
+      .deleteNotification(id)
+      .subscribe({
+
+        next: () => {
+
+          this.notifications =
+            this.notifications.filter(
+              n =>
+                n.notificationId !== id
+            );
+
+          this.unreadCount =
+            this.notifications.filter(
+              n => !n.isRead
+            ).length;
+
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Delete notification failed',
+            err
+          );
+        }
+      });
+  }
+
+  // ================= PROFILE MENU =================
+
+  toggleProfileMenu(
+    event: MouseEvent
+  ): void {
 
     event.stopPropagation();
 
@@ -157,6 +311,8 @@ export class Navbar implements OnInit {
     this.showNotifications = false;
   }
 
+  // ================= CLOSE =================
+
   @HostListener('document:click')
   closeMenus(): void {
 
@@ -165,12 +321,17 @@ export class Navbar implements OnInit {
     this.showProfileMenu = false;
   }
 
+  // ================= LOGOUT =================
+
   logout(): void {
 
     this.authService.logout();
 
-    window.location.href = '/login';
+    window.location.href =
+      '/login';
   }
+
+  // ================= SEARCH =================
 
   searchPosts(): void {
 
@@ -178,7 +339,9 @@ export class Navbar implements OnInit {
       this.searchQuery.trim();
 
     this.router.navigate(
+
       ['/'],
+
       {
         queryParams: query
           ? { search: query }
@@ -187,7 +350,11 @@ export class Navbar implements OnInit {
     );
   }
 
-  canWrite(role: string): boolean {
+  // ================= ROLE =================
+
+  canWrite(
+    role: string
+  ): boolean {
 
     return role === 'AUTHOR'
       || role === 'ADMIN';
